@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Widget Page</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+    }
+
+    .widget-container {
+      width: 100%;
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .widget-container h2 {
+      color: #333;
+    }
+
+    .button {
+      padding: 12px 24px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+
+    .button:hover {
+      background-color: #45a049;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #444;
+    }
+
+    .camera-container {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    video {
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    canvas {
+      display: none;
+    }
+
+    #imagePreview {
+      margin-top: 10px;
+      max-width: 100%;
+      max-height: 300px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    /* Ensure mobile responsiveness */
+    @media (max-width: 480px) {
+      .widget-container {
+        padding: 15px;
+      }
+
+      .button {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="widget-container">
+    <h2>Take a Picture</h2>
+    <p>Click the button below to use your camera:</p>
+    <button class="button" id="startCameraButton">Start Camera</button>
+
+    <div class="camera-container" id="cameraContainer" style="display: none;">
+      <video id="video" autoplay></video>
+      <button class="button" id="captureButton">Capture Image</button>
+      <canvas id="canvas"></canvas>
+      <img id="imagePreview" src="" alt="Captured Image" />
+    </div>
+
+    <div class="result" id="resultText"></div>
+  </div>
+
+  <script>
+    let video = document.getElementById('video');
+    let canvas = document.getElementById('canvas');
+    let context = canvas.getContext('2d');
+    let imagePreview = document.getElementById('imagePreview');
+    let cameraContainer = document.getElementById('cameraContainer');
+    let startCameraButton = document.getElementById('startCameraButton');
+    let captureButton = document.getElementById('captureButton');
+
+    // Start camera when button is clicked
+    startCameraButton.addEventListener('click', function() {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(function(stream) {
+            video.srcObject = stream;
+            cameraContainer.style.display = 'block';
+            startCameraButton.style.display = 'none';
+          })
+          .catch(function(error) {
+            alert("Camera access denied or not available.");
+            console.error("Error accessing camera: ", error);
+          });
+      } else {
+        alert("Camera not supported by your browser.");
+      }
+    });
+
+    // Capture the image when the capture button is clicked
+    captureButton.addEventListener('click', function() {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      let imageData = canvas.toDataURL('image/png');
+      imagePreview.src = imageData;
+      imagePreview.style.display = 'block';
+      saveImage(imageData);
+    });
+
+    // Function to simulate saving the image (in a real mobile app, this could trigger native functionality)
+    function saveImage(imageData) {
+      const resultText = document.getElementById('resultText');
+      resultText.textContent = 'Image captured! Unfortunately, saving directly to the gallery is not supported in a web browser.';
+      // In a real app, you would use native Android or iOS functionality to save the image to the gallery.
+    }
+  </script>
+</body>
+</html>
